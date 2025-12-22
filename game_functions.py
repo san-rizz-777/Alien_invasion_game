@@ -5,6 +5,18 @@ import pygame
 from settings import Settings
 from ship import Ship
 
+def check_keydown_events(event,ship):
+    """Handle keydown  events"""
+    if event.key == pygame.K_RIGHT:
+        ship.isMovingRight = True
+    elif event.key == pygame.K_LEFT:
+        ship.isMovingLeft = True
+
+def check_keyup_events(event,ship):
+    if event.key == pygame.K_RIGHT:
+        ship.isMovingRight = False
+    elif event.key == pygame.K_LEFT:
+        ship.isMovingLeft = False
 
 def check_events(ship):
     """Respond to keypresses and mouse events."""
@@ -13,16 +25,10 @@ def check_events(ship):
             sys.exit()
 
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RIGHT:
-                ship.isMovingRight = True
-            elif event.key == pygame.K_LEFT:
-                ship.isMovingLeft = True
+            check_keydown_events(event,ship)
 
         elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_RIGHT:
-                ship.isMovingRight = False
-            elif event.key == pygame.K_LEFT:
-                ship.isMovingLeft = False
+            check_keyup_events(event,ship)
 
 
 def update_screen(ai_settings,screen,ship):
