@@ -1,6 +1,7 @@
 import sys
 import pygame
 
+
 from bullet import Bullet
 from alien import Alien
 
@@ -38,7 +39,7 @@ def check_events(ship,ai_settings,screen,bullets):
             check_keyup_events(event,ship)
 
 
-def update_screen(ai_settings,screen,ship,bullets,aliens):
+def update_screen(ai_settings,screen,ship,aliens,bullets):
     """Update the images on screen and flip to new screen"""
     screen.fill(ai_settings.bg_color)
     # Redraw all the bullets behind the ship and aliens
@@ -51,7 +52,7 @@ def update_screen(ai_settings,screen,ship,bullets,aliens):
     # Make the most recently draw screen visible
     pygame.display.flip()
 
-def update_bullets(bullets):
+def update_bullets(ai_settings,screen,ship,aliens,bullets):
     """Update the position of bullets and remove the old bullets from the bullets list"""
     bullets.update()
 
@@ -59,6 +60,18 @@ def update_bullets(bullets):
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
+
+    check_bullet_alien_collisions(ai_settings,screen,ship,aliens,bullets)
+
+def check_bullet_alien_collisions(ai_settings,screen,ship,aliens,bullets):
+    # Check for any bullets that have hit the aliens
+    # If so delete both
+    collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+
+    if len(aliens)==0:
+        # Empty the existing bullets and create a new fleet
+        bullets.empty()
+        create_fleet(ai_settings,screen,ship,aliens)
 
 def get_number_rows(ai_settings,ship_height,alien_height):
     """Determine the number of available rows in the screen"""
@@ -97,7 +110,7 @@ def create_fleet(ai_settings,screen,ship,aliens):
             create_alien(ai_settings, screen, aliens, alien.rect.width, alien_number,y)
 
 def check_fleet_edges(ai_settings,aliens):
-    """Responnd appropriately if the alien is on the edge of the screen"""
+    """Respond appropriately if the alien is on the edge of the screen"""
     for alien in aliens.sprites():
         if alien.check_edges():
             change_fleet_direction(ai_settings,aliens)
