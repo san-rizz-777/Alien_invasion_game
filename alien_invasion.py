@@ -1,10 +1,10 @@
-import sys
 import pygame
 from settings import Settings
 from ship import Ship
 import game_functions as gf
 from pygame.sprite import Group
-
+from game_stats import GameStats
+from button import Button
 
 def run_game():
     # Initialize the game and create a screen object
@@ -25,15 +25,23 @@ def run_game():
     # Create a fleet of aliens
     gf.create_fleet(ai_settings,screen,ship,aliens)
 
+    # Create a instance to store game statistics
+    stats = GameStats(ai_settings)
+
+    # Make the button
+    play_button = Button(ai_settings,screen,"Play")
+
     # Start the main game loop
     while True:
        # Listening to events and updating the screen
-       gf.check_events(ship,ai_settings,screen,bullets)
-       ship.update()
-       gf.update_bullets(ai_settings,screen,ship,aliens,bullets)
-       gf.update_aliens(ai_settings, aliens)
-       print(bullets)
-       gf.update_screen(ai_settings,screen,ship,aliens,bullets)
+       gf.check_events(ship,ai_settings,screen,bullets, play_button, stats,aliens)
+
+       # Check if the game is over or not
+       if stats.game_active:
+           ship.update()
+           gf.update_bullets(ai_settings,screen,ship,aliens,bullets)
+           gf.update_aliens(ai_settings,stats,screen, ship,aliens,bullets)
+       gf.update_screen(ai_settings,screen,stats,ship,aliens,bullets,play_button)
 
 
 run_game()
