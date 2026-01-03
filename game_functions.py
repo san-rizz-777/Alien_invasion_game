@@ -8,7 +8,7 @@ from alien import Alien
 
 
 
-def check_keydown_events(event,ship,ai_settings,screen,stats,bullets):
+def check_keydown_events(event,ship,ai_settings,screen,stats,bullets,play_button,sb,aliens):
     """Handle keydown  events"""
     if event.key == pygame.K_RIGHT:
         ship.isMovingRight = True
@@ -19,9 +19,13 @@ def check_keydown_events(event,ship,ai_settings,screen,stats,bullets):
     elif event.key == pygame.K_q:
         sys.exit()
     elif event.key == pygame.K_p:
-        stats.game_active = True
-
-
+        # Optimization with the if statement avoiding the function call.
+        if stats.high_score == 0:
+            stats.game_active = True
+        else:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            check_play_button(play_button, stats, sb, mouse_x, mouse_y, ship, screen, aliens, bullets, ai_settings,
+                              True)
 
 # Fire a bullet if limit not reached
 def fire_bullet(ai_settings,screen,ship,bullets):
@@ -42,7 +46,7 @@ def check_events(ship,ai_settings,screen,bullets, play_button, stats, sb, aliens
             sys.exit()
 
         elif event.type == pygame.KEYDOWN:
-            check_keydown_events(event,ship,ai_settings,screen,stats,bullets)
+            check_keydown_events(event,ship,ai_settings,screen,stats,bullets,play_button,sb,aliens)
 
         elif event.type == pygame.KEYUP:
             check_keyup_events(event,ship)
@@ -52,12 +56,17 @@ def check_events(ship,ai_settings,screen,bullets, play_button, stats, sb, aliens
             check_play_button(play_button, stats, sb, mouse_x, mouse_y, ship, screen, aliens, bullets,ai_settings)
 
 
-def check_play_button(play_button, stats, sb, mouse_x, mouse_y, ship, screen, aliens, bullets,ai_settings):
+def check_play_button(play_button, stats, sb, mouse_x, mouse_y, ship, screen, aliens, bullets,ai_settings, flag=False):
     """Start a new game when player clicks the play button"""
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
+
+    # If p is pressed on keyboard.
+    if flag:
+        button_clicked=True
+
     if button_clicked and not stats.game_active:
 
-        # Reseting the game settings.
+        # Resetting the game settings.
         ai_settings.initialize_dynamic_settings()
 
         # Hide the mouse
