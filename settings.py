@@ -20,7 +20,7 @@ class Settings():
 
 
         # How quickly the game speeds up
-        self.speedup_scale = 1.1
+        self.speedup_scale = 1.5
         self.initialize_dynamic_settings()
 
         # Score points
@@ -31,7 +31,7 @@ class Settings():
 
     def initialize_dynamic_settings(self):
         """Initialize the game's static settings."""
-        self.ship_speed_factor = 7
+        self.ship_speed_factor = 2
         self.bullet_speed_factor = 10
         self.alien_speed_factor = 0.2
 

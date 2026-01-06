@@ -176,7 +176,7 @@ def create_fleet(ai_settings,screen,ship,aliens):
 
     # Create the fleet of aliens
     for rows in range(int(number_rows/2)):
-        y = alien.rect.height + 2*alien.rect.height * rows + 30
+        y = alien.rect.height + 2*alien.rect.height * rows + 40
         for alien_number in range(number_aliens_x):
             create_alien(ai_settings, screen, aliens, alien.rect.width, alien_number,y)
 
@@ -221,6 +221,8 @@ def ship_hit(ai_settings,stats,screen,ship,sb,aliens,bullets):
         sb.prep_score()
         stats.ships_left -=1
         sb.prep_ships()
+        stats.level  = 0
+        sb.prep_level()
         stats.game_active = False
         pygame.mouse.set_visible(True)
 
