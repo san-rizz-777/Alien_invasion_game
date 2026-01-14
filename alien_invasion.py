@@ -10,6 +10,7 @@ from scoreboard import Scoreboard
 def run_game():
     # Initialize the game and create a screen object
     pygame.init()
+    pygame.mixer.init()
     ai_settings = Settings()
     screen = pygame.display.set_mode((ai_settings.screen_width,ai_settings.screen_height))      #Creates a screen obj with dimensions 1200 by 800 pixels
     pygame.display.set_caption("Alien Invasion")
@@ -33,15 +34,20 @@ def run_game():
     # Make the button
     play_button = Button(ai_settings,screen,"Play")
 
+    # Make a instance of sound
+    sound = pygame.mixer.Sound('./audio/continuous_sound.mp3')
+
     # Start the main game loop
     while True:
        # Listening to events and updating the screen
-       gf.check_events(ship,ai_settings,screen,bullets, play_button, stats, sb, aliens)
+       gf.check_events(ship,ai_settings,screen,bullets, play_button, stats, sb, aliens,sound)
 
        # Check if the game is over or not
        if stats.game_active:
+           sound.play()
+           sound.set_volume(0.3)
            ship.update()
-           gf.update_bullets(ai_settings,screen,ship,stats,sb,aliens,bullets)
+           gf.update_bullets(ai_settings,screen,ship,stats,sb,aliens,bullets,sound)
            gf.update_aliens(ai_settings,stats,screen, ship,sb,aliens,bullets)
        gf.update_screen(ai_settings,screen,stats,ship,sb,aliens,bullets,play_button)
 

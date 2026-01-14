@@ -8,14 +8,15 @@ from alien import Alien
 
 
 
-def check_keydown_events(event,ship,ai_settings,screen,stats,bullets,play_button,sb,aliens):
+def check_keydown_events(event,ship,ai_settings,screen,stats,bullets,play_button,sb,aliens,sound):
     """Handle keydown  events"""
     if event.key == pygame.K_RIGHT:
         ship.isMovingRight = True
     elif event.key == pygame.K_LEFT:
         ship.isMovingLeft = True
     elif event.key == pygame.K_SPACE:
-        fire_bullet(ai_settings,screen,ship,bullets)
+        sound.stop()
+        fire_bullet(ai_settings,screen,ship,bullets,sound)
     elif event.key == pygame.K_q:
         sys.exit()
     elif event.key == pygame.K_p:
@@ -28,7 +29,10 @@ def check_keydown_events(event,ship,ai_settings,screen,stats,bullets,play_button
                               True)
 
 # Fire a bullet if limit not reached
-def fire_bullet(ai_settings,screen,ship,bullets):
+def fire_bullet(ai_settings,screen,ship,bullets,sound):
+
+    bullet_sound = pygame.mixer.Sound('audio/bullet_sound.wav')
+    bullet_sound.play()
     if len(bullets) < ai_settings.bullets_allowed:
         new_bullet = Bullet(ai_settings,screen,ship)
         bullets.add(new_bullet)
@@ -39,14 +43,14 @@ def check_keyup_events(event,ship):
     elif event.key == pygame.K_LEFT:
         ship.isMovingLeft = False
 
-def check_events(ship,ai_settings,screen,bullets, play_button, stats, sb, aliens):
+def check_events(ship,ai_settings,screen,bullets, play_button, stats, sb, aliens,sound):
     """Respond to keypresses and mouse events."""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
 
         elif event.type == pygame.KEYDOWN:
-            check_keydown_events(event,ship,ai_settings,screen,stats,bullets,play_button,sb,aliens)
+            check_keydown_events(event,ship,ai_settings,screen,stats,bullets,play_button,sb,aliens,sound)
 
         elif event.type == pygame.KEYUP:
             check_keyup_events(event,ship)
@@ -111,7 +115,7 @@ def update_screen(ai_settings,screen,stats,ship,sb,aliens,bullets,play_button):
     # Make the most recently draw screen visible
     pygame.display.flip()
 
-def update_bullets(ai_settings,screen,ship,stats,sb,aliens,bullets):
+def update_bullets(ai_settings,screen,ship,stats,sb,aliens,bullets,sound):
     """Update the position of bullets and remove the old bullets from the bullets list"""
     bullets.update()
 
@@ -120,9 +124,9 @@ def update_bullets(ai_settings,screen,ship,stats,sb,aliens,bullets):
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
 
-    check_bullet_alien_collisions(ai_settings,screen,ship,stats,sb,aliens,bullets)
+    check_bullet_alien_collisions(ai_settings,screen,ship,stats,sb,aliens,bullets,sound)
 
-def check_bullet_alien_collisions(ai_settings,screen,ship,stats,sb,aliens,bullets):
+def check_bullet_alien_collisions(ai_settings,screen,ship,stats,sb,aliens,bullets,sound):
     # Check for any bullets that have hit the aliens
     # If so delete both
     collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
@@ -134,6 +138,12 @@ def check_bullet_alien_collisions(ai_settings,screen,ship,stats,sb,aliens,bullet
         check_high_score(stats,sb)
 
     if len(aliens)==0:
+        sound.stop()
+        # Make a victory sound
+        v_sound = pygame.mixer.Sound('audio/victory_edit.mp3')
+        v_sound.set_volume(1.0)
+        v_sound.play()
+
         # Empty the existing bullets and create a new fleet and speed up the game.
         bullets.empty()
         ai_settings.increase_speed()
